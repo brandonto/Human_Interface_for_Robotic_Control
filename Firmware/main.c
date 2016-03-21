@@ -154,7 +154,9 @@ void main()
     unsigned char recv_payload[HIRCP_MAX_PAYLOAD_LEN];
     unsigned char send_payload[HIRCP_MAX_PAYLOAD_LEN];
     unsigned char highByte, lowByte;
+    unsigned char closed_loop_cmd;
     unsigned short adc_reading;
+    unsigned short degrees_sum;
     int i;
     tBoolean connected;
 
@@ -309,7 +311,24 @@ void main()
             }
             else if (g_hircp_mode == HIRCP_CLOSED_LOOP)
             {
-                MoveServo_SearchPressure(CMD_CLOSE, send_payload);
+            	degrees_sum = 0;
+
+            	// If average degrees of user is below 80 degrees, then open hand. Otherwise, close.
+            	for (i = 0; i < (NUM_SERVOS-1); i++)
+            	{
+            		degrees_sum =(unsigned short) (degrees_sum +  (unsigned char)recv_payload[i]);
+            	}
+
+            	if (degrees_sum < 400)
+            	{
+            		closed_loop_cmd = CMD_OPEN;
+            	}
+            	else
+            	{
+            		closed_loop_cmd = CMD_CLOSE;
+            	}
+
+            	MoveServo_SearchPressure(closed_loop_cmd, send_payload);
             }
             else
             {

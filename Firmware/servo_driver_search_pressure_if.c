@@ -72,15 +72,15 @@ void MoveServo_SearchPressure(unsigned char ucCommand, unsigned char * data)
 
             // Get the Pressure sensor reading
             usPressureSensorReading = GetSensorReading((enum Fingertip_Sensor_Type)ucFingerIndex);
-            UART_PRINT("Finger: %d, Reading: %d, Tolerance: %d ", ucFingerIndex, usPressureSensorReading, usPressureSensorTolerance);
+            //UART_PRINT("Finger: %d, Reading: %d, Tolerance: %d ", ucFingerIndex, usPressureSensorReading, usPressureSensorTolerance);
 
             // Close the hand incrementally checking the pressure sensor each time
             if (ucCommand == CMD_CLOSE)
             {
-            	//ADC reading BELOW threshold(bigger value means less pressure), Move towards Target
+            	//ADC reading BELOW threshold(bigger value means less pressure), Move towards Closed Position
             	if (usPressureSensorReading > usPressureSensorTolerance)
             	{
-            		UART_PRINT(" ++ ");
+            		//UART_PRINT(" ++ ");
 
             		// Limit the position of the finger
             		if ((ucDegreesCurrent += POSITION_INCREMENT) > ucDegreesLimit)
@@ -89,9 +89,9 @@ void MoveServo_SearchPressure(unsigned char ucCommand, unsigned char * data)
 					}
             	}
             	// ADC reading ABOVE threshold+tolerance (smaller value means more pressure), retreat position
-            	else if (usPressureSensorReading < (usPressureSensorTolerance + TOLERANCE) )
+            	else if (usPressureSensorReading < (usPressureSensorTolerance - TOLERANCE) )
             	{
-            		UART_PRINT(" -- ");
+            		//UART_PRINT(" -- ");
             		if (ucDegreesCurrent < (FINGER_OPEN_POS_LIMIT + RETREAT_DECREMENT))
 					{
 						ucDegreesCurrent = FINGER_OPEN_POS_LIMIT;
@@ -101,19 +101,38 @@ void MoveServo_SearchPressure(unsigned char ucCommand, unsigned char * data)
 						ucDegreesCurrent -= RETREAT_DECREMENT;
 					}
             	}
-            	// We are right in threshold+tolerance, then do nothing
-            	else
-            	{
-            		UART_PRINT(" // ");
-            	}
+            	// Otherwise, We are right in threshold+tolerance, then do nothing
             }
             // Set the fingers to open position
             else if (ucCommand == CMD_OPEN)
             {
-            	ucDegreesCurrent = FINGER_OPEN_POS_LIMIT;
+            	//ADC reading BELOW threshold(bigger value means less pressure), Move towards Open Position
+				if (usPressureSensorReading > usPressureSensorTolerance)
+				{
+					//UART_PRINT(" -- ");
+
+					if ( ucDegreesCurrent > (FINGER_OPEN_POS_LIMIT + POSITION_INCREMENT) )
+					{
+						ucDegreesCurrent -= POSITION_INCREMENT;
+					}
+					else
+					{
+						ucDegreesCurrent = FINGER_OPEN_POS_LIMIT;
+					}
+				}
+				// ADC reading ABOVE threshold+tolerance (smaller value means more pressure), retreat position
+				else if (usPressureSensorReading < (usPressureSensorTolerance - TOLERANCE) )
+				{
+					//UART_PRINT(" ++ ");
+					if ( (ucDegreesCurrent += RETREAT_DECREMENT) > ucDegreesLimit)
+					{
+						ucDegreesCurrent = ucDegreesLimit;
+					}
+				}
+				// Otherwise, We are right in threshold+tolerance, then do nothing
             }
 
-            UART_PRINT(" DegreesCurrent: %d\n\r", ucDegreesCurrent);
+            //UART_PRINT(" DegreesCurrent: %d\n\r", ucDegreesCurrent);
             // Move the servo, update the record struct
             MoveServo_PWM_Breakout(ucDegreesCurrent, (enum Servo_Joint_Type)ucFingerIndex);
             SetFingerPosition(&ServoPositionRecord, (enum Fingertip_Sensor_Type)ucFingerIndex, ucDegreesCurrent);

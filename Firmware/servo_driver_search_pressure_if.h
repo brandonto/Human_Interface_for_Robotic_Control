@@ -30,11 +30,11 @@
 #define RETREAT_DECREMENT 2     		// Movement to retreat if above threshold
 
 // Pressure Threshold values for each finger before servo stops
-#define PRESSURE_THRESHOLD_THUMB 940  	// Threshold pressure before servo stops
+#define PRESSURE_THRESHOLD_THUMB 970  	// Threshold pressure before servo stops
 #define PRESSURE_THRESHOLD_INDEX 900  	// Threshold pressure before servo stops
-#define PRESSURE_THRESHOLD_MIDDLE 940  // Threshold pressure before servo stops
-#define PRESSURE_THRESHOLD_RING 940  	// Threshold pressure before servo stops
-#define PRESSURE_THRESHOLD_PINKY 940  	// Threshold pressure before servo stops
+#define PRESSURE_THRESHOLD_MIDDLE 920  // Threshold pressure before servo stops
+#define PRESSURE_THRESHOLD_RING 1000  	// Threshold pressure before servo stops
+#define PRESSURE_THRESHOLD_PINKY 950  	// Threshold pressure before servo stops
 
 #define TOLERANCE 50           			// Tolerance value for holding position
 
